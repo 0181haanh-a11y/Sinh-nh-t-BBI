@@ -65,19 +65,19 @@ iframe{
   </div>
 
   <div class="slide">
-    <iframe src="page2.html"></iframe>
+    <iframe data-src="page2.html"></iframe>
   </div>
 
   <div class="slide">
-    <iframe src="page3.html"></iframe>
+    <iframe data-src="page3.html"></iframe>
   </div>
 
   <div class="slide">
-    <iframe src="page4.html"></iframe>
+    <iframe data-src="page4.html"></iframe>
   </div>
 
   <div class="slide">
-    <iframe src="page5.html"></iframe>
+    <iframe data-src=".html"></iframe>
   </div>
 
 </div>
@@ -95,6 +95,15 @@ nextBtn.style.display = "none";
 function goNext(){
   if(currentIndex < totalSlides - 1){
     currentIndex++;
+
+    const iframes = document.querySelectorAll("iframe");
+    const currentFrame = iframes[currentIndex];
+
+    // Nếu chưa load thì mới load
+    if(!currentFrame.src){
+      currentFrame.src = currentFrame.dataset.src;
+    }
+
     slider.style.transform = "translateX(-" + (currentIndex * 100) + "vw)";
     nextBtn.style.display = "none";
   }
@@ -111,3 +120,4 @@ window.addEventListener("message", function(event){
 </script>
 </body>
 </html>
+
