@@ -264,8 +264,10 @@ function updateCountdown(){
   clearInterval(timer);
   startBirthday();
 
-  // gửi tín hiệu mở khóa nút ở index
-  window.parent.postMessage("unlock","*");
+  // đợi animation typing 3 giây xong mới mở nút
+  setTimeout(function(){
+    window.parent.postMessage("unlock","*");
+  }, 3500);
 
   return;
 }
@@ -292,4 +294,5 @@ updateCountdown();
 </script>
 
 </body>
+
 </html>
