@@ -96,15 +96,23 @@ function goNext(){
   if(currentIndex < totalSlides - 1){
     currentIndex++;
 
+    slider.style.transform = "translateX(-" + (currentIndex * 100) + "vw)";
+
+    // Ẩn nút ngay khi chuyển slide
+    nextBtn.style.display = "none";
+
+    // Nếu là slide cuối thì ẩn luôn vĩnh viễn
+    if(currentIndex === totalSlides - 1){
+        nextBtn.style.display = "none";
+        return;
+    }
+
     const iframes = document.querySelectorAll("iframe");
     const currentFrame = iframes[currentIndex];
 
-    // Nếu chưa load thì mới load
     if(!currentFrame.src){
       currentFrame.src = currentFrame.dataset.src;
     }
-
-    slider.style.transform = "translateX(-" + (currentIndex * 100) + "vw)";
   }
 }
 
@@ -119,6 +127,7 @@ window.addEventListener("message", function(event){
 </script>
 </body>
 </html>
+
 
 
 
