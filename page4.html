@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chúc mừng sinh nhật</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100%;
+    height:100vh;
+    background-image:url("background5.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:"Times New Roman", serif;
+    position:relative;
+    overflow:hidden;
+}
+
+/* nền tối */
+.overlay{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter: blur(2px);
+    z-index:1;
+}
+
+canvas{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:2;
+}
+
+/* khung chữ cố định */
+.message{
+    position:relative;
+    z-index:3;
+    width:950px;
+    max-width:90%;
+    padding:40px;
+    color:#fff8e7;
+    font-size:20px;
+    line-height:1.4;
+    text-align:left; /* QUAN TRỌNG */
+    white-space:pre-wrap;
+}
+
+/* con trỏ */
+.cursor{
+    display:inline-block;
+    width:2px;
+    background:#fff8e7;
+    margin-left:3px;
+    animation:blink 1s infinite;
+    height:22px;
+    vertical-align:bottom;
+}
+
+@keyframes blink{
+    0%{opacity:1;}
+    50%{opacity:0;}
+    100%{opacity:1;}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay"></div>
+<canvas id="stars"></canvas>
+
+<div class="message">
+<span id="text"></span><span class="cursor"></span>
+</div>
+
+<script>
+// ===== TYPEWRITER =====
+const content = `Chúc mừng sinh nhật Khang nha, không biết cậu có đọc được những dòng này không nữa. Ban đầu tui đã suy nghĩ rất lâu không biết có nên chúc sinh nhật cậu không, có nên tặng quà không. Nhưng mà như một thói quen, tui vẫn quyết định làm gì đó đặc biệt một chút cho cậu. Sinh nhật năm nay của cậu không giống sinh nhật năm ngoái và lại càng không giống sinh nhật hai năm trước.
+
+Tui đã suy nghĩ rất lâu xem nên chúc cậu thế nào, và rồi ý tưởng này lóe lên. Có lẽ cậu đã nhận được món quà và đọc cách sử dụng nó rồi. Chắc lúc thấy tui kêu cậu quét mã QR thì cậu cũng hoảng lắm, tận mấy cái QR chứ chẳng phải một. Tui sợ là mình sẽ code sai và website không chạy được quá huhu. Tui cũng chỉ là tay nghiệp dư nên có mấy lỗi tui không fix được nên thông cảm nha.
+
+Có lẽ hôm nay cậu sẽ đi chơi và được tặng nhiều quà giá trị hơn. Chỉ tưởng tượng ra thôi là tui lại có suy nghĩ không nên rồi. Tính cách tui nóng lạnh thất thường, chắc cậu cũng rõ.
+
+Sinh nhật 18 tuổi này rất đặc biệt, tui đã code đúng 18 cây nến lận đó. Mong rằng cậu sẽ có một ngày vui vẻ, hạnh phúc bên gia đình, bạn bè, những người cậu yêu quý. Mong rằng năm nay cậu sẽ gặp nhiều may mắn, đạt được ước mơ của mình và đậu NV1. Tui hi vọng cậu sẽ là phiên bản tốt hơn của bản thân ở tuổi 18.
+
+Vậy nên là hãy sống thật hạnh phúc và vui vẻ nha.`;
+
+let i = 0;
+const speed = 35;
+const textElement = document.getElementById("text");
+
+function typeWriter(){
+    if(i < content.length){
+        textElement.textContent += content.charAt(i);
+        i++;
+        setTimeout(typeWriter, speed);
+    }
+}
+typeWriter();
+
+
+// ===== SAO BAY LÊN =====
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+function createStar(){
+    return {
+        x: Math.random() * canvas.width,
+        y: canvas.height + Math.random() * 100,
+        size: Math.random() * 2 + 1,
+        speed: Math.random() * 1.5 + 0.5,
+        opacity: Math.random()
+    }
+}
+
+for(let i=0;i<120;i++){
+    stars.push(createStar());
+}
+
+function drawStars(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    stars.forEach((star)=>{
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(255,255,255,"+star.opacity+")";
+        ctx.fill();
+
+        star.y -= star.speed;
+        star.opacity -= 0.002;
+
+        if(star.y < 0 || star.opacity <= 0){
+            Object.assign(star, createStar());
+        }
+    });
+
+    requestAnimationFrame(drawStars);
+}
+
+drawStars();
+
+window.addEventListener("resize",()=>{
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+setTimeout(function(){
+    window.parent.postMessage("unlock","*");
+},20000);
+</script>
+
+</body>
+</html>

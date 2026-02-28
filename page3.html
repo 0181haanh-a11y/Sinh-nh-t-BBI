@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Gift</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:black;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== DÒNG CHỮ ===== */
+.header-text{
+    position:fixed;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:100%;
+    text-align:center;
+    color:white;
+    padding:12px 20px;
+    font-size:14px;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index:10;
+}
+
+/* Canvas */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:0;
+}
+
+/* Ảnh bay */
+.photo{
+    position:absolute;
+    bottom:-200px;
+    border-radius:15px;
+    box-shadow:0 0 25px rgba(255,255,255,0.6);
+    animation: floatUp linear forwards;
+    z-index:5;
+}
+
+@keyframes floatUp{
+    from{
+        transform:translateY(0);
+        opacity:0;
+    }
+    10%{opacity:1;}
+    90%{opacity:1;}
+    to{
+        transform:translateY(-120vh);
+        opacity:0;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header-text">
+Đây là hình ảnh của quá trình tui đánh code và làm quà sinh nhật nè, món quà không mấy giá trị nhưng thôi thì "của cho không bằng cách cho", hi vọng cậu thích món quà này.
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<script>
+/* ===== PHÁO HOA NHẸ HƠN ===== */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+let particles = [];
+
+function createFirework(){
+    const x = Math.random()*canvas.width;
+    const y = Math.random()*canvas.height/2;
+
+    const colors = [
+        "#ff4d6d","#ffd60a",
+        "#00f5d4","#ffffff"
+    ];
+
+    for(let i=0;i<30;i++){   // còn 30 hạt thôi
+        particles.push({
+            x:x,
+            y:y,
+            angle:Math.random()*2*Math.PI,
+            speed:Math.random()*4+2,
+            radius:Math.random()*2+1,
+            color:colors[Math.floor(Math.random()*colors.length)],
+            life:60
+        });
+    }
+}
+
+function animate(){
+    ctx.globalCompositeOperation="source-over";
+    ctx.fillStyle="rgba(0,0,0,0.25)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.globalCompositeOperation="lighter";
+
+    for(let i=particles.length-1;i>=0;i--){
+        let p = particles[i];
+
+        p.x += Math.cos(p.angle)*p.speed;
+        p.y += Math.sin(p.angle)*p.speed;
+        p.life--;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.fillStyle=p.color;
+        ctx.shadowBlur=10;   // giảm blur để đỡ lag
+        ctx.shadowColor=p.color;
+        ctx.fill();
+
+        if(p.life<=0){
+            particles.splice(i,1);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+setInterval(createFirework,1000); // bắn thưa hơn
+animate();
+
+
+/* ===== ẢNH BAY 1 LẦN ===== */
+const images = [];
+for(let i=1;i<=30;i++){
+    images.push("anh"+i+".jpg");
+}
+let index = 0;
+
+function createPhoto(){
+    if(index >= images.length) return;
+
+    const img = document.createElement("img");
+    img.src = images[index];
+    img.className = "photo";
+    img.style.left = Math.random()*(document.documentElement.clientWidth - 200) + "px";
+    img.style.width = (140 + Math.random()*60) + "px";
+    img.style.animationDuration = "18s";
+
+    document.body.appendChild(img);
+
+    setTimeout(()=>{
+        img.remove();
+    },18000);
+
+    index++;
+}
+
+setInterval(createPhoto,2000);
+setTimeout(function(){
+    window.parent.postMessage("unlock","*");
+},50000);
+</script>
+
+</body>
+</html>

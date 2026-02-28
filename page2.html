@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  background:url("background3.png") center/cover no-repeat;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+}
+
+/* ===== VÒNG NẾN ===== */
+.container{
+  position:absolute;
+  bottom:70px;
+  left:50%;
+  transform:translateX(-50%);
+  width:1000px;
+  height:400px;
+}
+
+/* ===== NẾN ===== */
+.candle{
+  position:absolute;
+  width:18px;
+  height:110px;
+  background:linear-gradient(to bottom,#fff3cc,#e6d5a3);
+  border-radius:10px;
+}
+
+/* ===== LỬA ===== */
+.flame{
+  position:absolute;
+  top:-55px;
+  left:50%;
+  transform:translateX(-50%);
+  width:28px;
+  height:50px;
+  background:radial-gradient(circle at 50% 30%,#fff,#ffd54d 40%,#ff7a00 80%);
+  border-radius:50% 50% 60% 60%;
+  box-shadow:0 0 20px #ffd54d,0 0 40px #ff9800;
+  animation:flicker 0.2s infinite alternate;
+}
+
+@keyframes flicker{
+  from{ transform:translateX(-50%) scale(1) rotate(-2deg); }
+  to{ transform:translateX(-50%) scale(1.08) rotate(2deg); }
+}
+
+.blow{
+  animation:blowOut 0.6s forwards;
+}
+
+@keyframes blowOut{
+  0%{opacity:1;}
+  100%{opacity:0; transform:translateX(-50%) scale(0);}
+}
+
+/* ===== NÚT ===== */
+button{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 30px;
+  font-size:18px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+#blowBtn{
+  bottom:40px;
+  background:#ff4f87;
+  color:white;
+}
+
+#blowBtn:hover{
+  background:#ff2e70;
+}
+
+#nextBtn{
+  bottom:100px;
+  background:white;
+  color:#ff4f87;
+  display:none;
+}
+
+#nextBtn:hover{
+  background:#ffe6f0;
+}
+
+/* ===== TUYẾT LẤP LÁNH ===== */
+.snow{
+  position:absolute;
+  top:-10px;
+  background:white;
+  border-radius:50%;
+  pointer-events:none;
+  animation:snowFall linear forwards;
+  box-shadow:0 0 10px white;
+}
+
+@keyframes snowFall{
+  0%{
+    transform:translateY(-10px);
+    opacity:1;
+  }
+  100%{
+    transform:translateY(100vh);
+    opacity:0;
+  }
+}
+
+/* ===== BÓNG BAY SỐ 18 ===== */
+.balloon18{
+  position:absolute;
+  bottom:-200px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:250px;
+  font-weight:bold;
+  font-family:Arial, sans-serif;
+ color:#fff5e6;   /* trắng kem */
+
+text-shadow:
+  0 0 10px #fff5e6,
+  0 0 20px #ffe8cc,
+  0 0 40px #ffd8a8,
+  0 0 80px #ffc078;
+  opacity:0;
+  pointer-events:none;
+}
+
+.fly18{
+  animation:flyUp18 6s ease-out forwards;
+}
+
+@keyframes flyUp18{
+  0%{
+    bottom:-200px;
+    opacity:0;
+    transform:translateX(-50%) scale(0.8);
+  }
+  10%{
+    opacity:1;
+  }
+  100%{
+    bottom:110vh;
+    opacity:0.9;
+    transform:translateX(-50%) scale(1.05);
+  }
+}
+
+/* hiệu ứng lấp lánh */
+.sparkle{
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:white;
+  border-radius:50%;
+  pointer-events:none;
+  box-shadow:0 0 10px white,0 0 20px #e9d5ff;
+  animation:spark 1s linear forwards;
+}
+
+@keyframes spark{
+  0%{opacity:1; transform:scale(1);}
+  100%{opacity:0; transform:scale(0);}
+}
+/* ===== DÒNG CHỮ ƯỚC ===== */
+.wishText{
+  position:absolute;
+  top:40px;
+  width:100%;
+  text-align:center;
+  font-size:30px;
+  font-family:'Comic Sans MS', 'Segoe UI', cursive;
+  color:#fff5e6;
+  letter-spacing:1px;
+  text-shadow:
+    0 0 10px #fff5e6,
+    0 0 20px #ffe8cc,
+    0 0 40px rgba(255,216,168,0.7);
+  animation:softGlow 2s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+
+@keyframes softGlow{
+  from{opacity:0.8;}
+  to{opacity:1;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="wishText">Hãy ước rồi mới thổi nến nhé ~</div>
+
+<div class="container" id="container"></div>
+<button id="blowBtn">Thổi nến 🎂</button>
+<button id="nextBtn">Trang tiếp theo ➜</button>
+
+<script>
+const container=document.getElementById("container");
+const blowBtn=document.getElementById("blowBtn");
+const nextBtn=document.getElementById("nextBtn");
+
+/* ===== TẠO 18 NẾN ===== */
+for(let i=0;i<18;i++){
+  let angle=(2*Math.PI/18)*i;
+  let radiusX=380;
+  let radiusY=70;
+  let centerX=500;
+  let centerY=200;
+
+  let x=centerX+radiusX*Math.cos(angle)-9;
+  let y=centerY+radiusY*Math.sin(angle);
+
+  const candle=document.createElement("div");
+  candle.className="candle";
+  candle.style.left=x+"px";
+  candle.style.top=y+"px";
+
+  const flame=document.createElement("div");
+  flame.className="flame";
+  candle.appendChild(flame);
+
+  container.appendChild(candle);
+}
+
+let blown=false;
+
+/* ===== PHÁO HOA ===== */
+function randomFire(x,y){
+  confetti({
+    particleCount:100,
+    spread:100,
+    origin:{x:x,y:y},
+    startVelocity:45,
+    gravity:0.8,
+    ticks:200,
+    scalar:1.2,
+    colors:['#ff4d6d','#ffd166','#06d6a0','#118ab2','#ffffff']
+  });
+}
+
+function autoFireworks(){
+  for(let i=0;i<3;i++){
+    setTimeout(()=>{
+      randomFire(Math.random(),Math.random()*0.6);
+    },i*300);
+  }
+}
+
+/* ===== TUYẾT ===== */
+function createSnow(){
+  const snow=document.createElement("div");
+  snow.className="snow";
+  snow.style.left=Math.random()*window.innerWidth+"px";
+  snow.style.width=snow.style.height=(3+Math.random()*5)+"px";
+  snow.style.animationDuration=(4+Math.random()*4)+"s";
+  document.body.appendChild(snow);
+
+  setTimeout(()=>snow.remove(),8000);
+}
+
+/* ===== THỔI ===== */
+blowBtn.onclick=function(){
+  if(blown) return;
+  blown=true;
+
+  document.querySelectorAll(".flame").forEach(f=>{
+    f.classList.add("blow");
+  });
+
+  setTimeout(()=>{
+    autoFireworks();
+    createBalloon18(); // thêm dòng này
+    setInterval(autoFireworks,2000);
+    setInterval(createSnow,150); // tuyết rơi liên tục
+    window.parent.postMessage("unlock","*");
+  },800);
+};
+
+/* ===== TẠO BÓNG BAY 18 ===== */
+function createBalloon18(){
+  const balloon=document.createElement("div");
+  balloon.className="balloon18";
+  balloon.innerText="18";
+  document.body.appendChild(balloon);
+
+  setTimeout(()=>{
+    balloon.classList.add("fly18");
+  },50);
+
+  /* tạo lấp lánh quanh bóng */
+  const sparkleInterval=setInterval(()=>{
+    const rect=balloon.getBoundingClientRect();
+
+    const spark=document.createElement("div");
+    spark.className="sparkle";
+
+    spark.style.left=rect.left + Math.random()*rect.width + "px";
+    spark.style.top=rect.top + Math.random()*rect.height + "px";
+
+    document.body.appendChild(spark);
+    setTimeout(()=>spark.remove(),1000);
+  },120);
+
+  setTimeout(()=>{
+    clearInterval(sparkleInterval);
+  },6000);
+}
+</script>
+
+</body>
+</html>
