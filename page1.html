@@ -204,8 +204,8 @@ body.birthday-mode{
 
 <script>
 // Tháng tính từ 0 → 0 = Jan, 1 = Feb
-const targetDate = new Date(2026, 1, 28, 14, 26, 30).getTime();
-const content = document.getElementById("content");
+const targetDate = new Date().getTime() + 60000;
+  const content = document.getElementById("content");
 
 function launchConfetti(){
   confetti({
@@ -297,6 +297,7 @@ updateCountdown();
 </body>
 
 </html>
+
 
 
 
